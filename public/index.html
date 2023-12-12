@@ -6,12 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/css/styles.css">
+    <!--<a href="https://www.flaticon.com/free-icons/notification" title="notification icons">Notification icons created by Freepik - Flaticon</a>-->
 </head>
 <body>
     <nav>
         <ul>
             <li><a href="/index.html">Explore</a></li>
             <li><a href="/post.html">Post</a></li>
+            <li><button id="btn-notification">
+                <img src="icons/notification.png">
+            </button></li>
         </ul>
     </nav>
     <div class="container">
@@ -19,41 +23,11 @@
 
     <template>
         <article>
-            <h1>Korisnik</h1>
+            <h1>Posted on <span id="date"></span></h1>
             <img src="link" alt="Post">
-            <h2>Timestamp</h2>
         </article>
     </template>
 
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(function(registration) {
-                    console.log('Registration successful, scope is:', registration.scope);
-                })
-                .catch(function(error) {
-                    console.log('Service worker registration failed, error:', error);
-                });
-        } else {
-            console.log('Service workers are not supported.');
-        }
-
-        fetch('/api/posts?limit=5')
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(posts) {
-                for(let post of posts) {
-                    let template = document.querySelector('template');
-                    let clone = template.content.cloneNode(true);
-                    clone.querySelector('h1').innerText = post.user_email;
-                    clone.querySelector('img').src = post.photo_url;
-                    clone.querySelector('h2').innerText = post.date_created;
-                    clone.querySelector('article').setAttribute('post-id',post.post_id);
-                    document.querySelector('.container').appendChild(clone);
-                }
-            })
-    </script>
+    <script src="/js/index.min.js"></script>
 </body>
 </html>
