@@ -1,6 +1,6 @@
 {
-  "name": "PWA-01",
-  "short_name": "pwq",
+  "name": "Slikokaz",
+  "short_name": "Slikokaz",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff",
