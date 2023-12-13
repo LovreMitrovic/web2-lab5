@@ -1,7 +1,3 @@
-const bodyParser = require("body-parser");
-const util = require('util');
-const fs = require("fs");
-const crypto = require('crypto');
 const webpush = require('web-push');
 
 async function sendPushNotifications(db){
