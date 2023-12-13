@@ -9,7 +9,7 @@ const createTablesSQL = `
 
     CREATE TABLE posts (
         post_id SERIAL PRIMARY KEY,
-        photo_url VARCHAR(255) NOT NULL,
+        image BYTEA NOT NULL,
         posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     
@@ -29,19 +29,4 @@ function createTables() {
         })
 }
 
-function deleteFiles(){
-    let counter = 0;
-    const directoryPath = "./public/uploads/"
-    fs.readdirSync(directoryPath).forEach(file => {
-        const filePath = path.join(directoryPath, file);
-        if (fs.statSync(filePath).isFile()) {
-            fs.unlinkSync(filePath);
-            counter ++;
-        }
-    });
-    console.log(`${counter} files deleted`);
-}
-
-// Call the function to create tables
 createTables()
-deleteFiles();

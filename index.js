@@ -8,10 +8,11 @@ const {join} = require("path");
 const bodyParser = require("body-parser");
 const app = express();
 
+app.db = pgp(process.env.DB_URL);
 app.use(bodyParser.json());
 app.use('/api', apiRouter);
 app.use('/', express.static('public'));
-app.db = pgp(process.env.DB_URL);
+
 
 const externalUrl = process.env.RENDER_EXTERNAL_URL;
 const port = externalUrl && process.env.PORT ? parseInt(process.env.PORT) : 3000;

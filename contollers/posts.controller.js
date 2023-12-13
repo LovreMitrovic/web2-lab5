@@ -34,10 +34,10 @@ const get = async (req,res) => {
     const skip = parseInt(req.query.skip) ? parseInt(req.query.skip) : 0;
     const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 10;
     try {
-        let posts = await req.app.db.any('SELECT *  FROM posts ORDER BY post_id DESC OFFSET $1 LIMIT $2;',[skip,limit]);
+        let posts = await req.app.db.any('SELECT post_id, posted_at  FROM posts ORDER BY post_id DESC OFFSET $1 LIMIT $2;',[skip,limit]);
         posts = posts.map((post) => {
             return {...post,
-                post_url: `/api/posts/${post.post_id}`};
+                photo_url: `/api/posts/${post.post_id}/photo`};
         });
         res.json(posts);
     } catch(error){
@@ -54,10 +54,7 @@ const post = async (req,res) => {
             res.status(400).json({error: 'Image must be less than 5MB'});
             return;
         }
-        const uuid = crypto.randomUUID();
-        const user_id = 1;
-        fs.writeFileSync(`./public/uploads/${uuid}.jpg`, imageData);
-        const {post_id} = await req.app.db.one('INSERT INTO posts (photo_url) VALUES ($1) RETURNING post_id', [`/uploads/${uuid}.jpg`]);
+        const {post_id} = await req.app.db.one('INSERT INTO posts (image) VALUES ($1) RETURNING post_id', [imageData]);
         // send push notification
         sendPushNotifications(req.app.db)
         //    .then(r => console.log("Notifications sent"))
@@ -72,20 +69,6 @@ const post = async (req,res) => {
 const del = async (req,res) => {
     try{
         const posts = await req.app.db.any('SELECT * FROM posts',);
-        if(posts.length === 0){
-            res.sendStatus(200);
-            return;
-        }
-        for (let post of posts) {
-            let {photo_url, post_id} = post;
-            try{
-                await fs.unlinkSync('./public' + photo_url);
-                await req.app.db.none('DELETE FROM posts WHERE post_id = $1',[post_id]);
-            } catch(e) {
-                console.log(`Couldnt delete post ${post_id} ` + e);
-            }
-
-        }
         res.sendStatus(200);
     } catch(error){
         console.log(error);
