@@ -75,7 +75,9 @@ self.addEventListener('fetch', async function(event) {
                                 console.log(`SW: Fetching from network ${event.request.url}`);
                                 return caches.open(dynamicCacheName)
                                     .then((dynamicCache) => {
-                                        dynamicCache.put(event.request, response.clone())
+                                        if(event.request.method === 'GET'){
+                                            dynamicCache.put(event.request, response.clone())
+                                        }
                                         return response;
                                     })
                                     .catch((e) => console.log('SW: ' + e))
