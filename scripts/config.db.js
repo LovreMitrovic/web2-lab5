@@ -1,8 +1,6 @@
 require('dotenv').config();
 const pgp = require('pg-promise')();
 const db = pgp(process.env.DB_URL);
-const fs = require('fs');
-const path = require('path');
 
 const createTablesSQL = `
     DROP TABLE IF EXISTS posts, subscriptions;

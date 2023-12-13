@@ -10,6 +10,9 @@ const app = express();
 
 app.db = pgp(process.env.DB_URL);
 app.use(bodyParser.json());
+app.get('/healtz',(req,res) =>{
+    res.sendStatus(200);
+})
 app.use('/api', apiRouter);
 app.use('/', express.static('public'));
 
