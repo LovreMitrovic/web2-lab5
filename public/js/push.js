@@ -32,6 +32,7 @@ async function registerPushSubscriptions(){
             console.log("SUBSCRIPTION: removing");
             return;
         }
+        imgNotification.src = "icons/notification-full.png"
         sub = await reg.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(publicKey)
@@ -46,9 +47,9 @@ async function registerPushSubscriptions(){
         });
         if(res.ok){
             console.log("SUBSCRIPTION: granted");
-            imgNotification.src = "icons/notification-full.png"
         } else {
             console.log("SUBSCRIPTION: failed because res is not ok");
+            imgNotification.src = "icons/notification.png"
             await sub.unsubscribe();
         }
     } catch(e){
