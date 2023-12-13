@@ -13,7 +13,7 @@ function initIndex() {
         console.log('Service workers are not supported.');
     }
 
-    fetch('/api/posts?limit=5')
+    fetch('/api/posts?limit=20')
         .then(function (response) {
             return response.json();
         })
