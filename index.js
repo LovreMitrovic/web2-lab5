@@ -1,10 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const https = require("https");
-const fs = require("fs");
 const pgp = require('pg-promise')();
 const apiRouter = require('./router/router');
-const {join} = require("path");
 const bodyParser = require("body-parser");
 const app = express();
 

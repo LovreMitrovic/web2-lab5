@@ -68,7 +68,7 @@ const post = async (req,res) => {
 
 const del = async (req,res) => {
     try{
-        const posts = await req.app.db.any('SELECT * FROM posts',);
+        await req.app.db.any('DELETE FROM posts',);
         res.sendStatus(200);
     } catch(error){
         console.log(error);
