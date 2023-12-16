@@ -7,7 +7,10 @@ const filesToCache = [
     '/css/styles.css',
     'manifest.json',
     '/icons/notification.png',
-    '/icons/notification-full.png'
+    '/icons/notification-full.png',
+    '/error.html',
+    '/js/index.min.js',
+    '/js/post.min.js'
 
 ];
 
@@ -33,74 +36,31 @@ async function syncPhotos(){
 
 }
 
-self.addEventListener('install', function(event) {
-    console.log('SW: installing and cache static assets');
-    event.waitUntil(
-        caches.open(staticCacheName).then(function(cache) {
-            return cache.addAll(filesToCache);
-        })
-    );
-});
+import { CacheFirst, NetworkFirst } from 'workbox-strategies';
+import {ExpirationPlugin} from 'workbox-expiration';
+import {registerRoute} from 'workbox-routing';
 
-self.addEventListener('activate', function(event) {
-    const cacheWhitelist = [staticCacheName]
-    event.waitUntil(
-        caches.keys()
-            .then( (cachesNames) => {
-                return Promise.all(
-                    cachesNames.map((cacheName) => {
-                        if(cacheWhitelist.indexOf(cacheName) === -1){
-                            return caches.delete(cacheName);
-                        }
-                    })
-                )
-            })
-    );
-});
+registerRoute(
+    ({url}) => filesToCache.includes(url.pathname),
+    new CacheFirst({
+        cacheName: staticCacheName,
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 20,
+            })]
+    })
+);
 
-self.addEventListener('fetch', async function(event) {
-    event.respondWith(
-        caches.open(staticCacheName)
-            .then((staticCache) => {
-                return staticCache.match(event.request)
-                    .then((response) => {
-                        // if it is in static return it from cache
-                        if (response) {
-                            console.log(`SW: Returning from static cache ${event.request.url}`);
-                            return response;
-                        }
-                        // otherwise try fetching it from network and saveing it to dynamicCache cache
-                        return fetch(event.request)
-                            .then((response) => {
-                                console.log(`SW: Fetching from network ${event.request.url}`);
-                                return caches.open(dynamicCacheName)
-                                    .then((dynamicCache) => {
-                                        if(event.request.method === 'GET'){
-                                            dynamicCache.put(event.request, response.clone())
-                                        }
-                                        return response;
-                                    })
-                                    .catch((e) => console.log('SW: ' + e))
-                            })
-                            // if there is no network get it from dynamicCache cache or return 404.html
-                            .catch((e) => {
-                                return caches.open(dynamicCacheName)
-                                    .then((dynamicCache) => {
-                                        console.log(`SW: Fetching from dynamic cache ${event.request.url}`);
-                                        return dynamicCache.match(event.request)
-                                            .then((response) => {
-                                                if (response) {
-                                                    return response;
-                                                }
-                                                return dynamicCache.match('/error.html')
-                                                    .then((response) => response)
-                                            })
-                                    })
-                            })
-                    })
-            })
-    );
-});
+registerRoute(
+    ({url}) => !filesToCache.includes(url.pathname),
+    new NetworkFirst({
+        cacheName: dynamicCacheName,
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 100,
+            })]
+    })
+);
 
 self.addEventListener("sync", function(event) {
     console.log('SW: sync')

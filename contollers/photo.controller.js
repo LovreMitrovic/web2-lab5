@@ -5,16 +5,16 @@ const get = async (req,res) => {
     }
     const post_id = parseInt(req.params.post_id);
     try{
-        const posts = await req.app.db.many('SELECT image FROM posts WHERE post_id = $1',[post_id]);
-        if(posts.length === 0){
-            res.sendStatus(404);
-            return;
-        }
+        let posts = await req.app.db.many('SELECT * FROM posts WHERE post_id = $1',[post_id]);
         const image = posts[0].image;
         res.setHeader("Content-Disposition", "inline")
             .setHeader("Content-Type","image/png")
             .send(image)
     } catch(error){
+        if('result' in error && 'rowCount' in error.result && error.result.rowCount === 0){
+            res.sendStatus(404);
+            return;
+        }
         console.log(error)
         res.sendStatus(500);
     }
